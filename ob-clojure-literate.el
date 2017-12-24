@@ -111,12 +111,9 @@ Don't auto jack in by default for not rude."
     (make-local-variable 'org-babel-default-header-args:clojure))
   (add-to-list 'org-babel-default-header-args:clojure
                `(:session . ,ob-clojure-literate-session))
-  
+
   (setq ob-clojure-literate-session (ob-clojure-literate-set-session))
   (ob-clojure-literate-cider-do-not-find-ns)
-  
-  (define-key org-babel-map (kbd "M-s") 'ob-clojure-literate-specify-session-header-argument)
-  (define-key org-babel-map (kbd "M-j") 'ob-clojure-literate-auto-jackin)
 
   (message "ob-clojure-literate minor mode enabled.")
   )
@@ -131,14 +128,18 @@ Don't auto jack in by default for not rude."
               (mapcar
                (lambda (cons) (if (eq (car cons) :session) t cons))
                org-babel-default-header-args:clojure)))
-  
+
   (setq-local cider-buffer-ns ob-clojure-literate-original-ns)
-  
-  (define-key org-babel-map (kbd "M-s") nil)
-  (define-key org-babel-map (kbd "M-j") nil)
-  
+
   (message "ob-clojure-literate minor mode disabled.")
   )
+
+(defvar ob-clojure-literate-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "M-s") 'ob-clojure-literate-specify-session-header-argument)
+    (define-key map (kbd "M-j") 'ob-clojure-literate-auto-jackin)
+    map)
+  "Keymap for `ob-clojure-literate-mode'.")
 
 ;;;###autoload
 (define-minor-mode ob-clojure-literate-mode
@@ -147,7 +148,7 @@ Don't auto jack in by default for not rude."
   :init-value t
   :lighter "clj-lp"
   :group "ob-clojure-literate"
-  :keymap (let ((map (make-sparse-keymap))))
+  :keymap ob-clojure-literate-mode-map
   (if ob-clojure-literate-mode
       (ob-clojure-literate-disable)
     (ob-clojure-literate-enable))
